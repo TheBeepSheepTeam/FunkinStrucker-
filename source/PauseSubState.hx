@@ -21,8 +21,13 @@ class PauseSubState extends MusicBeatSubstate
 		'Resume',
 		'Restart Song',
 		'Change Difficulty',
-		'Toggle Practice Mode',
+		'Change GameSettings',
 		'Exit to menu'
+	];
+	var gamePlaySettings:Array<String> = [
+		'Toggle Practice Mode',
+		'Toggle BotPlay',
+		'BACK'
 	];
 	var difficultyChoices:Array<String> = ['EASY', 'NORMAL', 'HARD', 'BACK'];
 
@@ -32,6 +37,7 @@ class PauseSubState extends MusicBeatSubstate
 	var pauseMusic:FlxSound;
 
 	var practiceText:FlxText;
+	var botplayText:FlxText;
 
 	public function new(x:Float, y:Float)
 	{
@@ -78,6 +84,14 @@ class PauseSubState extends MusicBeatSubstate
 		practiceText.x = FlxG.width - (practiceText.width + 20);
 		practiceText.visible = PlayState.practiceMode;
 		add(practiceText);
+
+		botplayText = new FlxText(20, 15 + 64 + 32 + 32, 0, "BOTPLAY MODE", 32);
+		botplayText.scrollFactor.set();
+		botplayText.setFormat(Paths.font('vcr.ttf'), 32);
+		botplayText.updateHitbox();
+		botplayText.x = FlxG.width - (botplayText.width + 20);
+		botplayText.visible = PlayState.botplay;
+		add(botplayText);
 
 		levelDifficulty.alpha = 0;
 		levelInfo.alpha = 0;
@@ -154,9 +168,16 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.storyDifficulty = curSelected;
 					FlxG.resetState();
 
+				case 'Change GameSettings':
+					menuItems = gamePlaySettings;
+					regenMenu();
 				case 'Toggle Practice Mode':
 					PlayState.practiceMode = !PlayState.practiceMode;
 					practiceText.visible = PlayState.practiceMode;
+
+				case 'Toggle BotPlay':
+					PlayState.botplay = !PlayState.botplay;
+					botplayText.visible = PlayState.botplay;
 
 				case 'Change Difficulty':
 					menuItems = difficultyChoices;

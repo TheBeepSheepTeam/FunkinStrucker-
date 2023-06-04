@@ -114,6 +114,7 @@ class OptionsState extends MusicBeatState
 		FlxG.switchState(new MainMenuState());
 	}
 
+	#if Polymod
 	function reloadMod()
 	{
 		var rawEnabledMods:String = "";
@@ -125,8 +126,15 @@ class OptionsState extends MusicBeatState
 		File.saveContent(ModMenu.MOD_PATH + "/modList.txt", rawEnabledMods.trim());
 		ModMenu.enabledMods = rawEnabledMods.trim().split('\n');
 		FlxG.sound.play(Paths.sound('cancelMenu'));
-		switchPage(Options);
+		if (FlxG.sound.music != null)
+			FlxG.sound.music.stop();
+		TitleState.initialized = false;
+		TitleState.closedState = false;
+		Polymod.loadMods(ModMenu.enabledMods);
+		FlxG.sound.playMusic(Paths.music('freakyMenu'));
+		FlxG.switchState(new TitleState());
 	}
+	#end
 }
 
 class Page extends FlxGroup

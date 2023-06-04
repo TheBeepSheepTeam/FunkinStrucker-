@@ -8,10 +8,19 @@ import openfl.events.NetStatusEvent;
 import openfl.media.Video;
 import openfl.net.NetConnection;
 import openfl.net.NetStream;
+#if hxCodec
+import hxcodec.VideoHandler;
+#end
+
+using StringTools;
 
 class VideoState extends MusicBeatState
 {
+	#if hxCodec
+	var video:VideoHandler;
+	#else
 	var video:Video;
+	#end
 	var netStream:NetStream;
 	private var overlay:Sprite;
 
@@ -29,9 +38,23 @@ class VideoState extends MusicBeatState
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
+		#if hxCodec
+		video = new VideoHandler();
+		video.finishCallback = function()
+		{
+			FlxG.removeChild(video);
+
+			TitleState.initialized = false;
+			FlxG.switchState(new TitleState());
+		}
+		#else
 		video = new Video();
+		#end
 		FlxG.addChildBelowMouse(video);
 
+		#if hxCodec
+		video.playVideo(Paths.video('kickstarterTrailer.mp4').replace('videos:',''));
+		#else
 		var netConnection = new NetConnection();
 		netConnection.connect(null);
 
@@ -40,7 +63,8 @@ class VideoState extends MusicBeatState
 		netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, netStream_onAsyncError);
 		netConnection.addEventListener(NetStatusEvent.NET_STATUS, netConnection_onNetStatus);
 		// netStream.addEventListener(NetStatusEvent.NET_STATUS);
-		netStream.play(Paths.file('music/kickstarterTrailer.mp4'));
+		netStream.play(Paths.video('kickstarterTrailer.mp4'));
+		#end
 
 		overlay = new Sprite();
 		overlay.graphics.beginFill(0, 0.5);
@@ -54,17 +78,29 @@ class VideoState extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		if (controls.ACCEPT)
+			#if hxCodec
+			video.stopVideo();
+			FlxG.removeChild(video);
+
+			TitleState.initialized = false;
+			TitleState.closedState = false;
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			FlxG.switchState(new TitleState());
+			#else
 			finishVid();
+			#end
 
 		super.update(elapsed);
 	}
 
+	#if !hxCodec
 	function finishVid():Void
 	{
 		netStream.dispose();
 		FlxG.removeChild(video);
 
 		TitleState.initialized = false;
+		FlxG.sound.playMusic(Paths.music('freakyMenu'));
 		FlxG.switchState(new TitleState());
 	}
 
@@ -91,6 +127,7 @@ class VideoState extends MusicBeatState
 
 		trace(event.toString());
 	}
+	#end
 
 	private function overlay_onMouseDown(event:MouseEvent):Void
 	{

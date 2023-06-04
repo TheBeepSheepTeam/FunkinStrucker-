@@ -25,6 +25,7 @@ class Boyfriend extends Character
 			if (animation.curAnim.name.startsWith('sing'))
 			{
 				holdTimer += elapsed;
+				trace("holdTimer += "+elapsed);
 			}
 			else
 				holdTimer = 0;

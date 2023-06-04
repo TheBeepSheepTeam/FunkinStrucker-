@@ -80,6 +80,7 @@ class LuaHandler {
 	public static var hscript:HScript = null;
 	#end
 
+	#if linc_luajit
 	public function new(luafile:String)
 	{
 		var lua:State = LuaL.newstate();
@@ -440,5 +441,5 @@ class HScript
 		HScript.parser.allowTypes = true;
 		return interp.execute(HScript.parser.parseString(codeToRun));
 	}
+	#end
 }
-#end
